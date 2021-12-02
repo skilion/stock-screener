@@ -1,17 +1,67 @@
 CREATE TABLE Symbol (
-    Symbol  VARCHAR(10) PRIMARY KEY
+    Symbol      VARCHAR(10) PRIMARY KEY,
+    LastUpdated DATETIME
 )
 
-CREATE TABLE Price (
-    Symbol          VARCHAR(10) REFERENCES Symbol(Symbol),
-    Date            Date,
-    AdjustedClose   DECIMAL(19,3)
+CREATE TABLE DataPoint (
+    Symbol              VARCHAR(10) REFERENCES Symbol(Symbol),
+    Date                DATE,
+    [Open]              FLOAT,
+    High                FLOAT,
+    Low                 FLOAT,
+    [Close]             FLOAT,
+    AdjustedClose       FLOAT,
+    Volume              INT,
+    DividendAmount      FLOAT,
+    SplitCoefficient    FLOAT,
     PRIMARY KEY (Symbol, Date)
 )
 
-CREATE TABLE AdditionalData (
-    Symbol  VARCHAR(10) REFERENCES Symbol(Symbol),
-    [Key]    VARCHAR(255),
-    Value   VARCHAR(5000) NOT NULL,
-    PRIMARY KEY (Symbol, [Key])
+CREATE TABLE CompanyOverview (
+    Symbol                      VARCHAR(10) PRIMARY KEY REFERENCES Symbol(Symbol),
+    AssetType                   VARCHAR(255) NOT NULL,
+    Name                        VARCHAR(255) NOT NULL,
+    Description                 VARCHAR(5000) NOT NULL,
+    CIK                         VARCHAR(255) NOT NULL,
+    Exchange                    VARCHAR(255) NOT NULL,
+    Currency                    VARCHAR(255) NOT NULL,
+    Country                     VARCHAR(255) NOT NULL,
+    Sector                      VARCHAR(255) NOT NULL,
+    Industry                    VARCHAR(255) NOT NULL,
+    Address                     VARCHAR(255) NOT NULL,
+    FiscalYearEnd               VARCHAR(255) NOT NULL,
+    LatestQuarter               DATE NOT NULL,
+    MarketCapitalization        INT NOT NULL,
+    EBITDA                      INT NOT NULL,
+    PERatio                     FLOAT NOT NULL,
+    PEGRatio                    FLOAT NOT NULL,
+    BookValue                   FLOAT NOT NULL,
+    DividendPerShare            FLOAT,
+    DividendYield               FLOAT,
+    EPS                         FLOAT NOT NULL,
+    RevenuePerShareTTM          FLOAT NOT NULL,
+    ProfitMargin                FLOAT NOT NULL,
+    OperatingMarginTTM          FLOAT NOT NULL,
+    ReturnOnAssetsTTM           FLOAT NOT NULL,
+    ReturnOnEquityTTM           FLOAT NOT NULL,
+    RevenueTTM                  INT NOT NULL,
+    GrossProfitTTM              INT NOT NULL,
+    DilutedEPSTTM               FLOAT NOT NULL,
+    QuarterlyEarningsGrowthYOY  FLOAT NOT NULL,
+    QuarterlyRevenueGrowthYOY   FLOAT NOT NULL,
+    AnalystTargetPrice          FLOAT NOT NULL,
+    TrailingPE                  FLOAT NOT NULL,
+    ForwardPE                   FLOAT NOT NULL,
+    PriceToSalesRatioTTM        FLOAT NOT NULL,
+    PriceToBookRatio            FLOAT NOT NULL,
+    EVToRevenue                 FLOAT NOT NULL,
+    EVToEBITDA                  FLOAT NOT NULL,
+    Beta                        FLOAT NOT NULL,
+    [52WeekHigh]                FLOAT NOT NULL,
+    [52WeekLow]                 FLOAT NOT NULL,
+    [50DayMovingAverage]        FLOAT NOT NULL,
+    [200DayMovingAverage]       FLOAT NOT NULL,
+    SharesOutstanding           INT NOT NULL,
+    DividendDate                DATE,
+    ExDividendDate              DATE,
 )

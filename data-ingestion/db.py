@@ -1,4 +1,5 @@
 import pyodbc
+from itertools import chain
 from typing import Any
 
 import config
@@ -35,7 +36,7 @@ def delete_datapoints(symbol: str) -> None:
     cursor = _connection.execute(sql, symbol)
     cursor.commit()
 
-def insert_datapoints(datapoints: TimeSeries) -> None:
+def insert_datapoints(symbol: str, datapoints: TimeSeries) -> None:
     sql = '''
         INSERT INTO DataPoint (Symbol, Date, [Open], High, Low, [Close],
             AdjustedClose, Volume, DividendAmount, SplitCoefficient)
@@ -43,7 +44,7 @@ def insert_datapoints(datapoints: TimeSeries) -> None:
     '''
     cursor = _connection.cursor()
     cursor.fast_executemany = True
-    cursor.execute(sql, map(_unmap_datapoint, datapoints))
+    cursor.executemany(sql, map(lambda x: list(chain([symbol], _unmap_datapoint(x))), datapoints))
     cursor.commit()
 
 def delete_company_overview(symbol: str) -> None:
@@ -93,6 +94,7 @@ def _map_datapoint(row: pyodbc.Row) -> DataPoint:
 
 def _unmap_datapoint(datapoint: DataPoint) -> list[Any]:
     return [
+        datapoint.date_,
         datapoint.open,
         datapoint.high,
         datapoint.low,
@@ -100,8 +102,7 @@ def _unmap_datapoint(datapoint: DataPoint) -> list[Any]:
         datapoint.adjusted_close,
         datapoint.volume,
         datapoint.dividend_amount,
-        datapoint.split_coefficient,
-        datapoint.date_
+        datapoint.split_coefficient
     ]
 
 def _unmap_company_verview(overview: CompanyOverview) -> list[Any]:

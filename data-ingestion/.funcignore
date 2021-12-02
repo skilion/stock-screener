@@ -1,0 +1,4 @@
+.vscode/
+tests/
+.git*
+local.settings.json

@@ -8,6 +8,8 @@ from typing import Any, Optional
 import config
 from models import CompanyOverview, DataPoint, TimeSeries
 
+_session = requests.Session()
+
 def get_time_series_compact(symbol: str) -> TimeSeries:
 	logging.debug(f'get_time_series_compact {symbol}')
 	return _request_time_series(symbol, False)
@@ -69,7 +71,7 @@ def _make_http_request(payload: Any) -> requests.Response:
 	retry = 3
 	while True:
 		try:
-			response = requests.get('https://www.alphavantage.co/query', params=payload)
+			response = _session.get('https://www.alphavantage.co/query', params=payload)
 			response.raise_for_status()
 			return response
 		except requests.HTTPError as e:

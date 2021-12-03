@@ -109,39 +109,45 @@ def _map_company_overview(data: Any) -> CompanyOverview:
 		str(data["FiscalYearEnd"]),
 		date.fromisoformat(data["LatestQuarter"]),
 		int(data["MarketCapitalization"]),
-		int(data["EBITDA"]),
-		float(data["PERatio"]),
-		float(data["PEGRatio"]),
-		float(data["BookValue"]),
+		_safe_int(data["EBITDA"]),
+		_safe_float(data["PERatio"]),
+		_safe_float(data["PEGRatio"]),
+		_safe_float(data["BookValue"]),
 		_safe_float(data["DividendPerShare"]),
-		float(data["DividendYield"]),
-		float(data["EPS"]),
-		float(data["RevenuePerShareTTM"]),
-		float(data["ProfitMargin"]),
-		float(data["OperatingMarginTTM"]),
-		float(data["ReturnOnAssetsTTM"]),
-		float(data["ReturnOnEquityTTM"]),
-		int(data["RevenueTTM"]),
-		int(data["GrossProfitTTM"]),
-		float(data["DilutedEPSTTM"]),
-		float(data["QuarterlyEarningsGrowthYOY"]),
-		float(data["QuarterlyRevenueGrowthYOY"]),
-		float(data["AnalystTargetPrice"]),
-		float(data["TrailingPE"]),
-		float(data["ForwardPE"]),
-		float(data["PriceToSalesRatioTTM"]),
-		float(data["PriceToBookRatio"]),
-		float(data["EVToRevenue"]),
-		float(data["EVToEBITDA"]),
-		float(data["Beta"]),
-		float(data["52WeekHigh"]),
-		float(data["52WeekLow"]),
-		float(data["50DayMovingAverage"]),
-		float(data["200DayMovingAverage"]),
-		int(data["SharesOutstanding"]),
+		_safe_float(data["DividendYield"]),
+		_safe_float(data["EPS"]),
+		_safe_float(data["RevenuePerShareTTM"]),
+		_safe_float(data["ProfitMargin"]),
+		_safe_float(data["OperatingMarginTTM"]),
+		_safe_float(data["ReturnOnAssetsTTM"]),
+		_safe_float(data["ReturnOnEquityTTM"]),
+		_safe_int(data["RevenueTTM"]),
+		_safe_int(data["GrossProfitTTM"]),
+		_safe_float(data["DilutedEPSTTM"]),
+		_safe_float(data["QuarterlyEarningsGrowthYOY"]),
+		_safe_float(data["QuarterlyRevenueGrowthYOY"]),
+		_safe_float(data["AnalystTargetPrice"]),
+		_safe_float(data["TrailingPE"]),
+		_safe_float(data["ForwardPE"]),
+		_safe_float(data["PriceToSalesRatioTTM"]),
+		_safe_float(data["PriceToBookRatio"]),
+		_safe_float(data["EVToRevenue"]),
+		_safe_float(data["EVToEBITDA"]),
+		_safe_float(data["Beta"]),
+		_safe_float(data["52WeekHigh"]),
+		_safe_float(data["52WeekLow"]),
+		_safe_float(data["50DayMovingAverage"]),
+		_safe_float(data["200DayMovingAverage"]),
+		_safe_int(data["SharesOutstanding"]),
 		_safe_date(data["DividendDate"]),
 		_safe_date(data["ExDividendDate"])
 	)
+
+def _safe_date(value: str) -> Optional[date]:
+	try:
+		return date.fromisoformat(value)
+	except ValueError:
+		return None
 
 def _safe_float(value: str) -> Optional[float]:
 	try:
@@ -149,8 +155,8 @@ def _safe_float(value: str) -> Optional[float]:
 	except ValueError:
 		return None
 
-def _safe_date(value: str) -> Optional[date]:
+def _safe_int(value: str) -> Optional[int]:
 	try:
-		return date.fromisoformat(value)
+		return int(value)
 	except ValueError:
 		return None

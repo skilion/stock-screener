@@ -2,7 +2,7 @@ import datetime
 import logging
 
 import azure.functions as func
-import db
+import ingest_market_data
 
 def main(mytimer: func.TimerRequest) -> None:
     utc_timestamp = datetime.datetime.utcnow().replace(
@@ -13,4 +13,4 @@ def main(mytimer: func.TimerRequest) -> None:
 
     logging.info('Python timer trigger function ran at %s', utc_timestamp)
 
-    print(db.get_symbols())
+    ingest_market_data.ingest_market_data()

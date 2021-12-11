@@ -5,15 +5,15 @@ CREATE TABLE Symbol (
 
 CREATE TABLE DataPoint (
     Symbol              VARCHAR(10) REFERENCES Symbol(Symbol),
-    Date                DATE,
-    [Open]              FLOAT,
-    High                FLOAT,
-    Low                 FLOAT,
-    [Close]             FLOAT,
-    AdjustedClose       FLOAT,
-    Volume              BIGINT,
-    DividendAmount      FLOAT,
-    SplitCoefficient    FLOAT,
+    Date                DATE NOT NULL,
+    [Open]              FLOAT NOT NULL,
+    High                FLOAT NOT NULL,
+    Low                 FLOAT NOT NULL,
+    [Close]             FLOAT NOT NULL,
+    AdjustedClose       FLOAT NOT NULL,
+    Volume              BIGINT NOT NULL,
+    DividendAmount      FLOAT NOT NULL,
+    SplitCoefficient    FLOAT NOT NULL,
     PRIMARY KEY (Symbol, Date)
 )
 

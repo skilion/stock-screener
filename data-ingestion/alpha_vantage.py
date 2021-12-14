@@ -1,6 +1,6 @@
+import httpx
 import logging
 import random
-import requests
 import time
 from datetime import date
 from typing import Any, Optional
@@ -8,37 +8,37 @@ from typing import Any, Optional
 import config
 from models import CompanyOverview, DataPoint, TimeSeries
 
-_session = requests.Session()
+_client = httpx.AsyncClient()
 
-def get_time_series_compact(symbol: str) -> TimeSeries:
+async def get_time_series_compact(symbol: str) -> TimeSeries:
 	logging.debug(f'get_time_series_compact {symbol}')
-	return _request_time_series(symbol, False)
+	return await _request_time_series(symbol, False)
 
-def get_time_series_full(symbol: str) -> TimeSeries:
+async def get_time_series_full(symbol: str) -> TimeSeries:
 	logging.debug(f'get_time_series_full {symbol}')
-	return _request_time_series(symbol, True)
+	return await _request_time_series(symbol, True)
 
-def get_company_overview(symbol: str) -> CompanyOverview:
+async def get_company_overview(symbol: str) -> CompanyOverview:
 	logging.debug(f'get_company_overview {symbol}')
 	payload = {
 		'function': 'OVERVIEW',
 		'symbol': symbol,
 		'apikey': config.alpha_vantage_api_key
 	}
-	data = _make_request(payload)
+	data = await _make_request(payload)
 	if 'Symbol' not in data:
 		logging.error(f'Unexpected data format {data}')
 		raise Exception('get_company_overview failed')
 	return _map_company_overview(data)
 
-def _request_time_series(symbol: str, full: bool) -> TimeSeries:
+async def _request_time_series(symbol: str, full: bool) -> TimeSeries:
 	payload = {
 		'function': 'TIME_SERIES_DAILY_ADJUSTED',
 		'symbol': symbol,
 		'outputsize': 'full' if full else 'compact',
 		'apikey': config.alpha_vantage_api_key
 	}
-	data = _make_request(payload)
+	data = await _make_request(payload)
 	if 'Time Series (Daily)' not in data:
 		logging.error(f'Unexpected data format {data}')
 		raise Exception('_request_time_series failed')
@@ -51,10 +51,10 @@ def _parse_time_series(time_series: Any) -> TimeSeries:
 	timeseries.sort(key=lambda x: x.date_)
 	return timeseries
 
-def _make_request(payload: Any) -> Any:
+async def _make_request(payload: Any) -> Any:
 	data = {}
 	for _ in range(3):
-		data = _make_http_request(payload).json()
+		data = (await _make_http_request(payload)).json()
 		if 'Error Message' in data:
 			logging.error(f'Error: {data}')
 			raise Exception('_request_time_series failed')
@@ -67,14 +67,14 @@ def _make_request(payload: Any) -> Any:
 		raise Exception('_make_request failed')
 	return data
 
-def _make_http_request(payload: Any) -> requests.Response:
+async def _make_http_request(payload: Any) -> httpx.Response:
 	retry = 3
 	while True:
 		try:
-			response = _session.get('https://www.alphavantage.co/query', params=payload)
+			response = await _client.get('https://www.alphavantage.co/query', params=payload)
 			response.raise_for_status()
 			return response
-		except requests.HTTPError as e:
+		except httpx.HTTPError as e:
 			retry -= 1
 			if retry == 0:
 				raise e

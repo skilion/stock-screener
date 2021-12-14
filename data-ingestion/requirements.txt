@@ -4,4 +4,4 @@
 
 azure-functions
 pyodbc
-requests
+httpx

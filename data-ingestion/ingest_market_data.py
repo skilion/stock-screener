@@ -11,6 +11,7 @@ from datetime import date, datetime
 from models.datapoint import DataPoint, TimeSeries
 from models.symbol import Symbol
 
+
 parallel_requests = 10
 
 async def ingest_market_data() -> None:
@@ -35,8 +36,7 @@ async def _process_symbol(symbol: Symbol) -> None:
 
 async def _download_full_timeseries(symbol: Symbol) -> None:
 	timeseries = await alpha_vantage.get_time_series_full(symbol.symbol)
-	db.delete_datapoints(symbol.symbol)
-	db.insert_datapoints(symbol.symbol, timeseries)
+	db.overwrite_datapoints(symbol.symbol, timeseries)
 
 async def _download_compact_timeseries(symbol: Symbol) -> None:
 	timeseries = await alpha_vantage.get_time_series_compact(symbol.symbol)

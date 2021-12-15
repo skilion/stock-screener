@@ -33,11 +33,20 @@ def select_last_datapoint(symbol: str) -> DataPoint:
 	return _map_datapoint(cursor.fetchone())
 
 def delete_datapoints(symbol: str) -> None:
-	sql = 'DELETE FROM DataPoint WHERE Symbol = ?'
-	cursor = _connection.execute(sql, symbol)
+	cursor = _connection.cursor()
+	_delete_datapoints(cursor, symbol)
 	cursor.commit()
 
+def _delete_datapoints(cursor: pyodbc.Cursor, symbol: str) -> None:
+	sql = 'DELETE FROM DataPoint WHERE Symbol = ?'
+	cursor.execute(sql, symbol)
+
 def insert_datapoints(symbol: str, datapoints: TimeSeries) -> None:
+	cursor = _connection.cursor()
+	_insert_datapoints(cursor, symbol, datapoints)
+	cursor.commit()
+
+def _insert_datapoints(cursor: pyodbc.Cursor, symbol: str, datapoints: TimeSeries) -> None:
 	logging.debug(f'insert_datapoints {symbol} count {len(datapoints)}')
 	if len(datapoints) == 0:
 		return
@@ -46,11 +55,15 @@ def insert_datapoints(symbol: str, datapoints: TimeSeries) -> None:
 			AdjustedClose, Volume, DividendAmount, SplitCoefficient)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	'''
-	cursor = _connection.cursor()
 	cursor.fast_executemany = True
 	unmapped_datapoints = list(map(_unmap_datapoint, datapoints))
 	unmapped_datapoints_with_symbol = list(map(lambda x: list(chain([symbol], x)), unmapped_datapoints))
 	cursor.executemany(sql, unmapped_datapoints_with_symbol)
+
+def overwrite_datapoints(symbol: str, datapoints: TimeSeries) -> None:
+	cursor = _connection.cursor()
+	_delete_datapoints(cursor, symbol)
+	_insert_datapoints(cursor, symbol, datapoints)
 	cursor.commit()
 
 def delete_company_overview(symbol: str) -> None:

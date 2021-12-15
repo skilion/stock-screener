@@ -10,7 +10,7 @@ from typing import Any, Optional
 from models import CompanyOverview, DataPoint, TimeSeries
 
 
-_client = httpx.AsyncClient()
+_client = httpx.AsyncClient(timeout=10) # default timeout is 5 secs
 _alpha_vantage_api_key = os.environ['alpha_vantage_api_key']
 
 async def get_time_series_compact(symbol: str) -> TimeSeries:
@@ -74,12 +74,12 @@ async def _make_http_request(payload: Any) -> httpx.Response:
 			response = await _client.get('https://www.alphavantage.co/query', params=payload)
 			response.raise_for_status()
 			return response
-		except httpx.HTTPError as e:
+		except httpx.HTTPError as exc:
 			retry -= 1
 			if retry == 0:
-				raise e
+				raise exc
 			else:
-				logging.error(str(e))
+				logging.error(f"HTTP Exception for {exc.request.url} - {type(exc).__name__} - {exc}")
 				await asyncio.sleep(random.randint(10, 30))
 
 def _map_datapoint(datestr: str, data: Any) -> DataPoint:

@@ -1,0 +1,45 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "htmx@1.6.1",
+      "destination": "wwwroot/lib/htmx/",
+      "files": [
+        "htmx.min.js"
+      ]
+    },
+    {
+      "library": "bootstrap@5.1.3",
+      "destination": "wwwroot/lib/bootstrap/",
+      "files": [
+        "js/bootstrap.min.js",
+        "css/bootstrap.min.css",
+        "css/bootstrap.min.css.map",
+        "js/bootstrap.min.js.map"
+      ]
+    },
+    {
+      "library": "apexcharts@3.32.0",
+      "destination": "wwwroot/lib/apexcharts/",
+      "files": [
+        "apexcharts.min.js"
+      ]
+    },
+    {
+      "library": "alpinejs@3.7.0",
+      "destination": "wwwroot/lib/alpinejs/",
+      "files": [
+        "cdn.min.js"
+      ]
+    },
+    {
+      "provider": "unpkg",
+      "library": "@alpinejs/persist@3.7.0",
+      "destination": "wwwroot/lib/alpinejs/persist/",
+      "files": [
+        "dist/cdn.min.js"
+      ]
+    }
+  ]
+}

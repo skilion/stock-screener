@@ -1,0 +1,118 @@
+﻿@model StockScreenerWebApp.Models.Overview
+@{
+    Layout = "_Layout";
+    var overview = Model.CompanyOverview;
+}
+
+<div class="container-xxl">
+    <div class="row my-3">
+        <div class="col">
+            <h3>@overview.Name (@overview.Symbol)</h3>
+            <p>@overview.Description</p>
+
+            <div class="m-3">
+                <div id="chart" style="max-width: 60rem; margin: auto;"></div>
+                <div class="d-flex flex-row justify-content-center">
+                    <div id="chart-range-controls" class="btn-group flex-grow-0">
+                        <button type="button" class="btn btn-outline-primary" onclick="onChartRangeClick(this)">1Y</button>
+                        <button type="button" class="btn btn-outline-primary" onclick="onChartRangeClick(this)">6m</button>
+                        <button type="button" class="btn btn-outline-primary" onclick="onChartRangeClick(this)">3m</button>
+                        <button type="button" class="btn btn-outline-primary active" onclick="onChartRangeClick(this)">1m</button>
+                        <button type="button" class="btn btn-outline-primary" onclick="onChartRangeClick(this)">1w</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 g-3">
+        <div class="col">Exchange: @overview.Exchange</div>
+        <div class="col">Currency: @overview.Currency</div>
+        <div class="col">Country: @overview.Country</div>
+        <div class="col">Sector: @overview.Sector</div>
+        <div class="col">Industry: @overview.Industry</div>
+        <div class="col">Mkt Cap: @overview.MarketCapitalization</div>
+        <div class="col">EBITDA: @overview.Ebitda</div>
+        <div class="col">P/E: @overview.Peratio</div>
+        <div class="col">PEG: @overview.Pegratio</div>
+        <div class="col">B/V: @overview.BookValue</div>
+        <div class="col">DPS: @overview.DividendPerShare</div>
+        <div class="col">Dividend Yield: @overview.DividendYield</div>
+        <div class="col">EPS: @overview.Eps</div>
+        <div class="col">Profit Margin: @overview.ProfitMargin</div>
+    </div>
+</div>
+
+<script>
+    var options = {
+        chart: {
+            type: 'candlestick',
+            zoom: {
+                enabled: false,
+                autoScaleYaxis: true
+            }
+        },
+        series: [{
+            data: @Model.TimeseriesJson
+        }],
+        grid: { 
+            xaxis: {
+                lines: {
+                    show: true
+                }
+            },
+            yaxis: {
+                lines: {
+                    show: true
+                }
+            }
+        },
+        xaxis: {
+            type: 'datetime'
+        },
+        plotOptions: {
+            candlestick: {
+                wick: {
+                    useFillColor: true,
+                }
+            }
+        }
+    }
+    var chart = new ApexCharts(document.querySelector('#chart'), options);
+    chart.render();
+    zoomChart('1m');
+
+    function onChartRangeClick(element) {
+        clearActiveButtons(); 
+        element.classList.add('active');
+        zoomChart(element.innerHTML);
+    }
+
+    function zoomChart(label) {
+        var zoomStart = new Date((new Date().getTime()) - timeLabelToMs(label)).getTime();
+        chart.zoomX(zoomStart, new Date().getTime());
+    }
+
+    function timeLabelToMs(label) {
+        const dayMs = 1000 * 60 * 60 * 24;
+        switch (label) {
+        case '1w':
+            return dayMs * 7;
+        case '1m':
+            return dayMs * 30;
+        case '3m':
+            return dayMs * 60;
+        case '6m':
+            return dayMs * 120;
+        case '1Y':
+            return dayMs * 365;
+        }
+    }
+
+    function clearActiveButtons() {
+        var buttons = document.querySelectorAll("#chart-range-controls button");
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].classList.remove('active');
+        }
+    }
+</script>

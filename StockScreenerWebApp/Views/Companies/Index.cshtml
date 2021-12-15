@@ -1,0 +1,126 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+<div class="container-xxl" x-data="pageData()">
+    <div class="row my-3">
+        <div class="col">
+            <div class="border rounded">
+                <div class="border-bottom px-3 pt-2">
+                    <h5>Company Selection</h5>
+                </div>
+                <div class="p-3">
+                    <ol id="filter-list">
+                        <li>Universe: SP500</li>
+                        <template x-for="filter in filters">
+                            <li><span x-text="filter"></span> <span
+                                style="color: red; cursor: pointer;"
+                                x-on:click="removeFilter(filter)">&#10799;</span>
+                            </li>
+                        </template>
+                    </ol>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-filter">Add Filter</button>
+                </div>
+
+                <div id="add-filter" class="modal fade" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content" x-data="addFilterModalData()">
+                            <div class="modal-header">
+                                <div class="modal-title">Add filter</div>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row mb-3">
+                                    <label for="filter" class="col-2 col-form-label">Filter:</label>
+                                    <div class="col">
+                                        <select id="filter" class="form-select" x-model="filter">
+                                            <option>MktCap</option>
+                                            <option>EBITDA</option>
+                                            <option>P/E</option>
+                                            <option>PEG</option>
+                                            <option>B/V</option>
+                                            <option>DPS</option>
+                                            <option>DividendYield</option>
+                                            <option>EPS</option>
+                                            <option>ProfitMargin</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="condition" class="col-2 col-form-label">Condition:</label>
+                                    <div class="col">
+                                        <select id="condition" class="form-select" x-model="condition">
+                                            <option value=">">Greater then</option>
+                                            <option value="<">Less then</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="value" class="col-2 col-form-label">Value:</label>
+                                    <div class="col">
+                                        <input type="text" id="value" class="form-control" x-bind:class="isValid() ? '' : 'is-invalid'" x-model="value" />
+                                        <p>k=1000, m=1000k, b=1000m, t=1000b</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button class="btn btn-primary"
+                                    x-bind:class="isValid() ? '' : 'disabled'"
+                                    x-on:click="filters.push(filter + condition + value)"
+                                    hx-get="/Companies/List"
+                                    x-bind:hx-vals="htmxVals()"
+                                    hx-target="#company-list"
+                                    data-bs-dismiss="modal">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-3">
+        <div class="col">
+            <div id="company-list" hx-get="/Companies/List" x-bind:hx-vals="htmxVals()" hx-trigger="loadCompanies from:body">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data("pageData", function () {
+            return {
+                overviewOpen: false,
+                filters: this.$persist(['MktCap>300B']),
+                htmxVals() {
+                    return '{"filter":["' + this.filters.join('","') + '"]}';
+                },
+                removeFilter(filter) {
+                    this.filters = this.filters.filter(x => x !== filter);
+                    setTimeout(() => document.body.dispatchEvent(new CustomEvent('loadCompanies')));
+                }
+            }
+        });
+
+        Alpine.data("addFilterModalData", function () {
+            return {
+                filter: 'MktCap',
+                condition: '>',
+                value: '0',
+                isValid() {
+                    let matchNumRegex = /^[+-]?\d+(\.\d+)?[bmktBMKT]?$/
+                    return matchNumRegex.test(this.value);
+                }
+            }
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.body.dispatchEvent(new CustomEvent('loadCompanies'));
+    })
+</script>

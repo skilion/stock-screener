@@ -1,3 +1,4 @@
+import asyncio
 import httpx
 import logging
 import random
@@ -79,8 +80,8 @@ async def _make_http_request(payload: Any) -> httpx.Response:
 			if retry == 0:
 				raise e
 			else:
-				logging.error(e)
-				time.sleep(random.randint(10, 30))
+				logging.error(str(e))
+				await asyncio.sleep(random.randint(10, 30))
 
 def _map_datapoint(datestr: str, data: Any) -> DataPoint:
 	return DataPoint(

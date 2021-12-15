@@ -1,7 +1,4 @@
-# Python Function App to Linux on Azure
-# Build a Python function app and deploy it to Azure as a Linux function app.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+# Deploys DataIngestion to Azure
 
 trigger:
 - main
@@ -17,7 +14,7 @@ variables:
   vmImageName: 'ubuntu-latest'
 
   # Working Directory
-  workingDirectory: '$(System.DefaultWorkingDirectory)/data-ingestion'
+  workingDirectory: '$(System.DefaultWorkingDirectory)/DataIngestion'
 
 stages:
 - stage: Build

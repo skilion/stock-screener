@@ -1,15 +1,16 @@
 import asyncio
 import httpx
 import logging
+import os
 import random
 import time
 from datetime import date
 from typing import Any, Optional
 
-import config
 from models import CompanyOverview, DataPoint, TimeSeries
 
 _client = httpx.AsyncClient()
+_alpha_vantage_api_key = os.environ['alpha_vantage_api_key']
 
 async def get_time_series_compact(symbol: str) -> TimeSeries:
 	logging.debug(f'get_time_series_compact {symbol}')
@@ -24,7 +25,7 @@ async def get_company_overview(symbol: str) -> CompanyOverview:
 	payload = {
 		'function': 'OVERVIEW',
 		'symbol': symbol,
-		'apikey': config.alpha_vantage_api_key
+		'apikey': _alpha_vantage_api_key
 	}
 	data = await _make_request(payload)
 	if 'Symbol' not in data:
@@ -37,7 +38,7 @@ async def _request_time_series(symbol: str, full: bool) -> TimeSeries:
 		'function': 'TIME_SERIES_DAILY_ADJUSTED',
 		'symbol': symbol,
 		'outputsize': 'full' if full else 'compact',
-		'apikey': config.alpha_vantage_api_key
+		'apikey': _alpha_vantage_api_key
 	}
 	data = await _make_request(payload)
 	if 'Time Series (Daily)' not in data:

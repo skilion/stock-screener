@@ -1,12 +1,12 @@
 import logging
 import pyodbc
+import os
 from itertools import chain
 from typing import Any
 
-import config
 from models import CompanyOverview, DataPoint, Symbol, TimeSeries, datapoint
 
-_connection = pyodbc.connect(config.odbc_connection_string)
+_connection = pyodbc.connect(os.environ['odbc_connection_string'])
 
 def select_symbols() -> list[Symbol]:
 	sql = 'SELECT Symbol, LastUpdated FROM Symbol'
@@ -23,14 +23,12 @@ def select_last_datapoint(symbol: str) -> DataPoint:
 		SELECT Symbol, Date, [Open], High, Low, [Close], AdjustedClose,
 			Volume, DividendAmount, SplitCoefficient
 		FROM DataPoint
-
-
 		WHERE Symbol = ? AND Date = (
 			SELECT MAX(Date)
 			FROM DataPoint
 			WHERE Symbol = ?
 		)
-		'''
+		''' 	
 	cursor = _connection.execute(sql, symbol, symbol)
 	return _map_datapoint(cursor.fetchone())
 

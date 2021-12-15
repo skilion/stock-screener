@@ -9,19 +9,17 @@ from typing import Any, Optional
 
 from models import CompanyOverview, DataPoint, TimeSeries
 
+
 _client = httpx.AsyncClient()
 _alpha_vantage_api_key = os.environ['alpha_vantage_api_key']
 
 async def get_time_series_compact(symbol: str) -> TimeSeries:
-	logging.debug(f'get_time_series_compact {symbol}')
 	return await _request_time_series(symbol, False)
 
 async def get_time_series_full(symbol: str) -> TimeSeries:
-	logging.debug(f'get_time_series_full {symbol}')
 	return await _request_time_series(symbol, True)
 
 async def get_company_overview(symbol: str) -> CompanyOverview:
-	logging.debug(f'get_company_overview {symbol}')
 	payload = {
 		'function': 'OVERVIEW',
 		'symbol': symbol,

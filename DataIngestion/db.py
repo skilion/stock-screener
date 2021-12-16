@@ -7,6 +7,7 @@ from typing import Any
 from models import CompanyOverview, DataPoint, Symbol, TimeSeries, datapoint
 
 _connection = pyodbc.connect(os.environ['odbc_connection_string'])
+_connection.setencoding('latin1')
 
 def select_symbols() -> list[Symbol]:
 	sql = 'SELECT Symbol, LastUpdated FROM Symbol'

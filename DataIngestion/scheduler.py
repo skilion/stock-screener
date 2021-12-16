@@ -1,8 +1,8 @@
 import asyncio
-from typing import Any, Awaitable, Coroutine
+from typing import Any, Coroutine
 
 async def run_parallel(cors: list[Coroutine[Any, Any, None]], parallel_tasks: int = 10) -> None:
-    running_tasks: list[Awaitable[None]] = []
+    running_tasks: list[asyncio.Task[None]] = []
 
     while len(cors) > 0:
         while len(cors) > 0 and len(running_tasks) < parallel_tasks:
@@ -15,8 +15,8 @@ async def run_parallel(cors: list[Coroutine[Any, Any, None]], parallel_tasks: in
         running_tasks = _remove_completed_tasks(running_tasks)
         await asyncio.sleep(1)
 
-def _remove_completed_tasks(running_tasks: list[Awaitable[None]]) -> None:
-    remaining_tasks: list[Awaitable[None]] = []
+def _remove_completed_tasks(running_tasks: list[asyncio.Task[None]]) -> list[asyncio.Task[None]]:
+    remaining_tasks: list[asyncio.Task[None]] = []
     for task in running_tasks:
         if task.done():
             task.result() # re-raises any exception

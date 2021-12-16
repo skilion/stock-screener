@@ -22,14 +22,14 @@ def select_last_datapoint(symbol: str) -> DataPoint:
 	sql = '''
 		SELECT Symbol, Date, [Open], High, Low, [Close], AdjustedClose,
 			Volume, DividendAmount, SplitCoefficient
-		FROM DataPoint
+		FROM DataPoint as d1
 		WHERE Symbol = ? AND Date = (
 			SELECT MAX(Date)
-			FROM DataPoint
-			WHERE Symbol = ?
+			FROM DataPoint as d2
+			WHERE d1.Symbol = d2.Symbol
 		)
-		''' 	
-	cursor = _connection.execute(sql, symbol, symbol)
+		'''
+	cursor = _connection.execute(sql, symbol)
 	return _map_datapoint(cursor.fetchone())
 
 def delete_datapoints(symbol: str) -> None:

@@ -1,5 +1,5 @@
 import math
-import logging
+import logging 
 from typing import Optional
 
 import alpha_vantage
@@ -40,7 +40,9 @@ async def _download_full_timeseries(symbol: Symbol) -> None:
 
 async def _download_compact_timeseries(symbol: Symbol) -> None:
 	timeseries = await alpha_vantage.get_time_series_compact(symbol.symbol)
+	logging.info('select_last_datapoint')
 	last_datapoint_db = db.select_last_datapoint(symbol.symbol)
+	logging.info('done')
 	last_datapoint_ts = _find_datapoint(last_datapoint_db.date_, timeseries)
 	if last_datapoint_ts is None:
 		await _download_full_timeseries(symbol)

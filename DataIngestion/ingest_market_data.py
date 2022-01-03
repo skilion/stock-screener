@@ -61,6 +61,10 @@ def _find_datapoint(date: date, timeseries: TimeSeries) -> Optional[DataPoint]:
 	return filtered_list[0]
 
 async def _download_company_overview(symbol: str) -> None:
-	overview = await alpha_vantage.get_company_overview(symbol)
+	try:
+		overview = await alpha_vantage.get_company_overview(symbol)
+	except Exception as e:
+		logging.error(e)
+		return
 	db.delete_company_overview(symbol)
 	db.insert_company_overview(overview)
